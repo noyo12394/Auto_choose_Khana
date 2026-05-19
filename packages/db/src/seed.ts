@@ -18,11 +18,11 @@ db.prepare("INSERT INTO goals (user_id, protein_g, calories, other_json) VALUES 
 const pantryItems = [
   ["sku-1", 6, -5],
   ["sku-2", 3, -2],
-  ["sku-3", 20, -17],
+  ["sku-3", 20, -5],
   ["sku-4", 10, -9],
   ["sku-5", 18, -8],
-  ["sku-6", 5, -4],
-  ["sku-9", 14, -13],
+  ["sku-6", 5, -1],
+  ["sku-9", 14, -4],
   ["sku-15", 4, -3]
 ] as const;
 for (const [skuId, cadence, daysAgo] of pantryItems) {
