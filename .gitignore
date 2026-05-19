@@ -10,3 +10,4 @@ data/*.sqlite-wal
 *.tsbuildinfo
 .env
 .DS_Store
+.vercel
