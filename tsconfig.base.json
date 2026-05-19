@@ -1,0 +1,22 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
+    "strict": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    "resolveJsonModule": true,
+    "noUncheckedIndexedAccess": true,
+    "paths": {
+      "@khana/core": ["./packages/core/src/index.ts"],
+      "@khana/db": ["./packages/db/src/index.ts"],
+      "@khana/agent": ["./packages/agent/src/index.ts"],
+      "@khana/fixtures": ["./fixtures/index.ts"],
+      "@khana/mcp-food": ["./packages/mcp-food/src/tools.ts"],
+      "@khana/mcp-instamart": ["./packages/mcp-instamart/src/tools.ts"],
+      "@khana/mcp-dineout": ["./packages/mcp-dineout/src/tools.ts"]
+    }
+  }
+}

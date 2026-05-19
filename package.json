@@ -1,0 +1,40 @@
+{
+  "name": "auto-choose-khana",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "packageManager": "pnpm@9.15.4",
+  "scripts": {
+    "build": "pnpm -r build",
+    "check": "pnpm -r check",
+    "test": "vitest run",
+    "seed": "tsx packages/db/src/seed.ts",
+    "dev": "concurrently -n food,instamart,dineout,web -c orange,green,blue,magenta \"pnpm --filter @khana/mcp-food dev\" \"pnpm --filter @khana/mcp-instamart dev\" \"pnpm --filter @khana/mcp-dineout dev\" \"pnpm --filter @khana/web dev\"",
+    "cli": "tsx apps/cli/src/index.ts",
+    "demo": "tsx scripts/demo.ts",
+    "cron": "tsx packages/cron/src/index.ts"
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.55.0",
+    "@modelcontextprotocol/sdk": "^1.15.1",
+    "better-sqlite3": "^11.9.1",
+    "chalk": "^5.4.1",
+    "concurrently": "^9.1.2",
+    "dotenv": "^16.4.7",
+    "lucide-react": "^0.468.0",
+    "node-cron": "^3.0.3",
+    "zod": "^3.24.1"
+  },
+  "devDependencies": {
+    "@types/better-sqlite3": "^7.6.13",
+    "@types/node": "^22.10.5",
+    "@types/node-cron": "^3.0.11",
+    "@vitejs/plugin-react": "^4.3.4",
+    "next": "14.2.23",
+    "typescript": "^5.7.3",
+    "tsx": "^4.19.2",
+    "vitest": "^2.1.8",
+    "react": "18.3.1",
+    "react-dom": "18.3.1"
+  }
+}

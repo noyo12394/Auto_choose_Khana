@@ -1,0 +1,11 @@
+{
+  "name": "@khana/mcp-instamart",
+  "version": "0.1.0",
+  "type": "module",
+  "main": "src/index.ts",
+  "scripts": {
+    "dev": "tsx src/index.ts",
+    "build": "tsc -p tsconfig.json --noEmit",
+    "check": "tsc -p tsconfig.json --noEmit"
+  }
+}
