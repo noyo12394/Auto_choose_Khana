@@ -2,7 +2,7 @@
   "name": "@khana/mcp-instamart",
   "version": "0.1.0",
   "type": "module",
-  "main": "src/index.ts",
+  "main": "src/tools.ts",
   "dependencies": {
     "@khana/fixtures": "workspace:*"
   },

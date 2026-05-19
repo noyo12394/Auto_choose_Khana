@@ -112,6 +112,15 @@ importers:
       '@khana/fixtures':
         specifier: workspace:*
         version: link:../../fixtures
+      '@khana/mcp-dineout':
+        specifier: workspace:*
+        version: link:../mcp-dineout
+      '@khana/mcp-food':
+        specifier: workspace:*
+        version: link:../mcp-food
+      '@khana/mcp-instamart':
+        specifier: workspace:*
+        version: link:../mcp-instamart
 
   packages/core:
     dependencies:

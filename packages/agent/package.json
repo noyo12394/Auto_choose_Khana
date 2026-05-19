@@ -6,7 +6,10 @@
   "dependencies": {
     "@khana/core": "workspace:*",
     "@khana/db": "workspace:*",
-    "@khana/fixtures": "workspace:*"
+    "@khana/fixtures": "workspace:*",
+    "@khana/mcp-dineout": "workspace:*",
+    "@khana/mcp-food": "workspace:*",
+    "@khana/mcp-instamart": "workspace:*"
   },
   "scripts": {
     "build": "tsc -p tsconfig.json --noEmit",

@@ -23,6 +23,7 @@ export type UserContext = {
 };
 
 export function dbPath() {
+  if (process.env.VERCEL) return "/tmp/pantry.sqlite";
   const configured = process.env.DATABASE_URL ?? "./data/pantry.sqlite";
   return resolve(repoRoot, configured);
 }
@@ -89,6 +90,7 @@ function parseJson<T>(value: string): T {
 }
 
 export function getUserContext(userId: number, db = migrate()): UserContext {
+  ensureDemoUser(db);
   const user = db.prepare("SELECT * FROM users WHERE id = ?").get(userId) as UserContext["user"] | undefined;
   const profile = db.prepare("SELECT * FROM profile WHERE user_id = ?").get(userId) as Omit<UserContext["profile"], "dietary" | "cuisines"> & { dietary: string; cuisines: string };
   const goals = db.prepare("SELECT * FROM goals WHERE user_id = ?").get(userId) as Omit<UserContext["goals"], "other_json"> & { other_json: string };
@@ -121,5 +123,32 @@ export function logToolCall(userId: number, server: string, payload: unknown, st
 }
 
 export function listUsers(db = migrate()) {
+  ensureDemoUser(db);
   return db.prepare("SELECT * FROM users ORDER BY id").all() as UserContext["user"][];
+}
+
+export function ensureDemoUser(db = migrate()) {
+  const existing = db.prepare("SELECT id FROM users WHERE id = 1").get();
+  if (existing) return;
+  db.prepare("INSERT INTO users (id, name, location, created_at) VALUES (?, ?, ?, ?)").run(1, "Aanya", "Bandra, Mumbai", new Date().toISOString());
+  db.prepare(`
+    INSERT INTO profile (user_id, dietary, cuisines, spice, budget_lunch, budget_dinner, budget_weekly_groceries, auto_order_budget)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+  `).run(1, JSON.stringify(["high-protein"]), JSON.stringify(["South Indian", "Maharashtrian", "Coastal"]), "medium", 280, 420, 2400, 350);
+  db.prepare("INSERT INTO goals (user_id, protein_g, calories, other_json) VALUES (?, ?, ?, ?)").run(1, 115, 2050, JSON.stringify({ fiberG: 28, note: "Prefer steady protein across meals" }));
+  const pantryItems = [
+    ["sku-1", 6, -5],
+    ["sku-2", 3, -2],
+    ["sku-3", 20, -5],
+    ["sku-4", 10, -9],
+    ["sku-5", 18, -8],
+    ["sku-6", 5, -1],
+    ["sku-9", 14, -4],
+    ["sku-15", 4, -3]
+  ] as const;
+  for (const [skuId, cadence, daysAgo] of pantryItems) {
+    const last = new Date();
+    last.setDate(last.getDate() + daysAgo);
+    db.prepare("INSERT INTO pantry (user_id, sku_id, typical_days_between_orders, last_ordered_at) VALUES (?, ?, ?, ?)").run(1, skuId, cadence, last.toISOString());
+  }
 }

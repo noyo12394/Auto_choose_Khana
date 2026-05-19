@@ -8,6 +8,9 @@ import { dirname, resolve } from "node:path";
 import { getUserContext, logToolCall } from "@khana/db";
 import { predictPantryRestock, rankMenuItems, rankSkus, remainingDailyGoal, sumMacros } from "@khana/core";
 import { skus, type MenuItem } from "@khana/fixtures";
+import { getMenu, placeFoodOrder, searchRestaurants } from "@khana/mcp-food";
+import { addToCart, checkoutInstamart, getSku, searchSkus, viewCart } from "@khana/mcp-instamart";
+import { bookTable, searchDineout } from "@khana/mcp-dineout";
 
 type ServerName = "food" | "instamart" | "dineout";
 type ToolCall = { server: ServerName; name: string; args: unknown; result: unknown };
@@ -28,6 +31,28 @@ class McpHub {
 
   async connect() {
     if (this.ready) return;
+    if (process.env.VERCEL) {
+      this.tools = {
+        food: [
+          { name: "search_restaurants", inputSchema: { type: "object" } },
+          { name: "get_menu", inputSchema: { type: "object" } },
+          { name: "place_food_order", inputSchema: { type: "object" } }
+        ],
+        instamart: [
+          { name: "search_skus", inputSchema: { type: "object" } },
+          { name: "get_sku", inputSchema: { type: "object" } },
+          { name: "add_to_cart", inputSchema: { type: "object" } },
+          { name: "view_cart", inputSchema: { type: "object" } },
+          { name: "checkout_instamart", inputSchema: { type: "object" } }
+        ],
+        dineout: [
+          { name: "search_dineout", inputSchema: { type: "object" } },
+          { name: "book_table", inputSchema: { type: "object" } }
+        ]
+      };
+      this.ready = true;
+      return;
+    }
     for (const server of ["food", "instamart", "dineout"] as const) {
       const client = new Client({ name: `pantry-agent-${server}`, version: "0.1.0" });
       const transport = new StdioClientTransport({
@@ -44,6 +69,11 @@ class McpHub {
 
   async call(userId: number, server: ServerName, name: string, args: Record<string, unknown>): Promise<unknown> {
     await this.connect();
+    if (process.env.VERCEL) {
+      const parsed = await directStubCall(server, name, args);
+      logToolCall(userId, server, { tool: name, args, result: parsed });
+      return parsed;
+    }
     const client = this.clients.get(server);
     if (!client) throw new Error(`MCP server not connected: ${server}`);
     const result = await withBackoff(() => client.callTool({ name, arguments: args }));
@@ -57,6 +87,26 @@ class McpHub {
     this.clients.clear();
     this.ready = false;
   }
+}
+
+async function directStubCall(server: ServerName, name: string, args: Record<string, unknown>) {
+  if (server === "food") {
+    if (name === "search_restaurants") return searchRestaurants(args as Parameters<typeof searchRestaurants>[0]);
+    if (name === "get_menu") return getMenu(String(args.restaurant_id));
+    if (name === "place_food_order") return placeFoodOrder(args as Parameters<typeof placeFoodOrder>[0]);
+  }
+  if (server === "instamart") {
+    if (name === "search_skus") return searchSkus(args as Parameters<typeof searchSkus>[0]);
+    if (name === "get_sku") return getSku(String(args.sku_id));
+    if (name === "add_to_cart") return addToCart(args as Parameters<typeof addToCart>[0]);
+    if (name === "view_cart") return viewCart(String(args.cart_id));
+    if (name === "checkout_instamart") return checkoutInstamart(args as Parameters<typeof checkoutInstamart>[0]);
+  }
+  if (server === "dineout") {
+    if (name === "search_dineout") return searchDineout(args as Parameters<typeof searchDineout>[0]);
+    if (name === "book_table") return bookTable(args as Parameters<typeof bookTable>[0]);
+  }
+  throw new Error(`Unknown direct stub call: ${server}.${name}`);
 }
 
 const hub = new McpHub();
