@@ -1,0 +1,4 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "include": ["src/**/*.ts", "../db/src/**/*.ts", "../core/src/**/*.ts", "../mcp-food/src/**/*.ts", "../mcp-instamart/src/**/*.ts", "../mcp-dineout/src/**/*.ts", "../../fixtures/**/*.ts"]
+}
