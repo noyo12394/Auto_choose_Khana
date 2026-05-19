@@ -2,5 +2,6 @@
   "buildCommand": "pnpm --filter @khana/web build",
   "devCommand": "pnpm --filter @khana/web dev",
   "installCommand": "pnpm install",
+  "outputDirectory": "apps/web/.next",
   "framework": "nextjs"
 }
