@@ -5,11 +5,12 @@ import { useState } from "react";
 import type { UserContext } from "@khana/db";
 
 type ChatMessage = { role: "assistant" | "user"; text: string };
+const assistantIntro = "Tell me your need, budget, diet, or fitness target. I’ll search Swiggy, compare the options, and explain the best pick before ordering.";
 
 export function PantryApp({ initialContext, initialPrediction, notification }: { initialContext: UserContext; initialPrediction: { items: { name: string; daysUntilEmpty: number }[]; subtotal: number }; notification: { message?: string } | null }) {
   const [tab, setTab] = useState<"order" | "pantry" | "goals">("order");
   const [messages, setMessages] = useState<ChatMessage[]>([
-    { role: "assistant", text: "Tell me what you need. I’ll pull fresh Swiggy options and show why each pick fits." }
+    { role: "assistant", text: assistantIntro }
   ]);
   const [input, setInput] = useState("Dinner. High protein. Surprise me.");
   const [toolTrace, setToolTrace] = useState<string[]>([]);
@@ -70,25 +71,44 @@ export function PantryApp({ initialContext, initialPrediction, notification }: {
       {tab === "order" && (
         <section className="order-grid">
           <div className="chat">
-            <div className="quick-prompts">
-              <button onClick={() => send("Dinner. High protein. Surprise me.")}><Sparkles size={16} /> Dinner, surprise me</button>
-              <button onClick={() => send("Restock my pantry")}><ShoppingBasket size={16} /> Restock low groceries</button>
-              <button onClick={() => send("I need more protein this week.")}><Dumbbell size={16} /> More protein this week</button>
+            <div className="chat-intro">
+              <span>Assistant search</span>
+              <h2>Say what you need. Pantry handles the hunt.</h2>
+              <p>No menu scrolling, no grocery comparison spiral. It searches, re-ranks, and asks before checkout.</p>
             </div>
-            {messages.map((message, index) => (
-              <div key={index} className={`bubble ${message.role}`}>
-                {message.role === "assistant" ? <Bot size={18} /> : null}
-                <span>{message.text}</span>
-              </div>
-            ))}
+            <div className="quick-prompts" aria-label="Example prompts">
+              <button onClick={() => send("Dinner. High protein. Surprise me.")}><Sparkles size={16} /> Dinner, surprise me</button>
+              <button onClick={() => send("Restock my pantry")}><ShoppingBasket size={16} /> Restock groceries</button>
+              <button onClick={() => send("I need more protein this week.")}><Dumbbell size={16} /> Hit protein goal</button>
+            </div>
+            <div className="conversation">
+              {messages.map((message, index) => (
+                <div key={index} className={`bubble ${message.role}`}>
+                  {message.role === "assistant" ? <Bot size={18} /> : null}
+                  <span>{message.text}</span>
+                </div>
+              ))}
+            </div>
             <div className="composer">
-              <input value={input} onChange={(event) => setInput(event.target.value)} onKeyDown={(event) => event.key === "Enter" ? send() : undefined} />
+              <label htmlFor="pantry-chat">Ask Pantry</label>
+              <input id="pantry-chat" value={input} onChange={(event) => setInput(event.target.value)} onKeyDown={(event) => event.key === "Enter" ? send() : undefined} />
               <button onClick={() => send()}><Send size={18} /></button>
             </div>
           </div>
-          <aside className="trace">
-            <h2>Tool calls</h2>
-            {toolTrace.length ? toolTrace.map((line) => <code key={line}>{line}</code>) : <p>Fresh MCP calls appear here.</p>}
+          <aside className="decision-rail">
+            <section>
+              <span>What it optimizes</span>
+              <h2>Best option for this person, not a generic top result.</h2>
+              <ul>
+                <li><Check size={16} /> Protein, calories, spice, cuisine, and dietary constraints.</li>
+                <li><Check size={16} /> Fresh menu, SKU, price, ETA, and availability from MCP tools.</li>
+                <li><Check size={16} /> Confirmation before checkout unless inside auto-order rules.</li>
+              </ul>
+            </section>
+            <section>
+              <span>Tool trace</span>
+              {toolTrace.length ? toolTrace.map((line) => <code key={line}>{line}</code>) : <p>Search and order calls appear here after you ask.</p>}
+            </section>
           </aside>
         </section>
       )}

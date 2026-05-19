@@ -52,23 +52,46 @@ p { margin: 8px 0 0; color: #5c5149; }
 .mission h2, .panel-heading h2 { margin: 10px 0 0; font-size: 18px; }
 .mission p, .panel-heading p { line-height: 1.45; }
 .banner { width: 100%; margin: 18px 0; justify-content: center; font-weight: 650; }
-.order-grid { display: grid; grid-template-columns: minmax(0, 1fr) 320px; gap: 18px; margin-top: 18px; }
-.chat, .trace, .panel {
+.order-grid { display: grid; grid-template-columns: minmax(0, 1.6fr) minmax(280px, .8fr); gap: 18px; margin-top: 18px; align-items: start; }
+.chat, .decision-rail, .panel {
   border: 1px solid var(--line);
   background: rgba(255,250,242,.72);
   border-radius: 8px;
   padding: 18px;
 }
-.chat { min-height: 560px; display: flex; flex-direction: column; gap: 12px; }
+.chat { min-height: 620px; display: flex; flex-direction: column; gap: 12px; }
+.chat-intro {
+  border-bottom: 1px solid var(--line);
+  padding-bottom: 14px;
+}
+.chat-intro span, .decision-rail span {
+  color: var(--accent);
+  font-size: 12px;
+  font-weight: 650;
+  text-transform: uppercase;
+}
+.chat-intro h2 {
+  font-family: "Fraunces", serif;
+  font-size: 30px;
+  line-height: 1;
+  margin: 8px 0 0;
+}
 .quick-prompts { display: flex; gap: 8px; flex-wrap: wrap; }
 .quick-prompts button { min-height: 38px; font-size: 14px; }
-.bubble { max-width: 78%; white-space: pre-line; padding: 12px 14px; border-radius: 8px; line-height: 1.42; display: flex; gap: 8px; }
+.conversation { display: flex; flex-direction: column; gap: 12px; max-height: 470px; overflow: auto; padding-right: 4px; }
+.bubble { max-width: 88%; white-space: pre-line; padding: 12px 14px; border-radius: 8px; line-height: 1.42; display: flex; gap: 8px; }
 .bubble.assistant { background: var(--white); border: 1px solid var(--line); }
 .bubble.user { background: var(--ink); color: white; margin-left: auto; }
-.composer { display: flex; gap: 8px; margin-top: auto; }
+.composer { display: grid; grid-template-columns: minmax(0, 1fr) 56px; gap: 8px; margin-top: auto; }
+.composer label { grid-column: 1 / -1; font-size: 12px; font-weight: 650; color: #5c5149; }
 .composer input, .form input { width: 100%; border: 1px solid var(--line); border-radius: 8px; min-height: 44px; padding: 0 12px; background: white; color: var(--ink); }
-.trace { font-family: "JetBrains Mono", monospace; }
-.trace code { display: block; white-space: pre-wrap; border-top: 1px solid var(--line); padding: 10px 0; font-size: 12px; }
+.decision-rail { display: grid; gap: 18px; position: sticky; top: 18px; }
+.decision-rail section + section { border-top: 1px solid var(--line); padding-top: 16px; }
+.decision-rail h2 { font-size: 22px; line-height: 1.12; margin: 8px 0 0; }
+.decision-rail ul { list-style: none; display: grid; gap: 10px; padding: 0; margin: 14px 0 0; }
+.decision-rail li { display: grid; grid-template-columns: 18px 1fr; gap: 8px; line-height: 1.35; }
+.decision-rail li svg { color: var(--accent); }
+.decision-rail code { display: block; white-space: pre-wrap; border-top: 1px solid var(--line); padding: 10px 0; font-family: "JetBrains Mono", monospace; font-size: 12px; }
 .panel-heading { margin-bottom: 16px; max-width: 680px; }
 table { width: 100%; border-collapse: collapse; }
 th, td { text-align: left; padding: 12px; border-bottom: 1px solid var(--line); }
@@ -79,5 +102,6 @@ th, td { text-align: left; padding: 12px; border-bottom: 1px solid var(--line); 
   .topbar { align-items: flex-start; flex-direction: column; }
   .mission { grid-template-columns: 1fr; }
   .order-grid { grid-template-columns: 1fr; }
+  .decision-rail { position: static; }
   .bubble { max-width: 100%; }
 }
