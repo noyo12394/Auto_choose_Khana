@@ -1,6 +1,9 @@
 import Database from "better-sqlite3";
 import { dirname, resolve } from "node:path";
 import { mkdirSync } from "node:fs";
+import { fileURLToPath } from "node:url";
+
+const repoRoot = resolve(dirname(fileURLToPath(import.meta.url)), "../../..");
 
 export type UserContext = {
   user: { id: number; name: string; location: string; created_at: string };
@@ -20,7 +23,8 @@ export type UserContext = {
 };
 
 export function dbPath() {
-  return resolve(process.env.DATABASE_URL ?? "./data/pantry.sqlite");
+  const configured = process.env.DATABASE_URL ?? "./data/pantry.sqlite";
+  return resolve(repoRoot, configured);
 }
 
 export function openDb(path = dbPath()) {
