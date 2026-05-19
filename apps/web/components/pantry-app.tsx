@@ -1,6 +1,6 @@
 "use client";
 
-import { Bot, Check, Send, ShoppingBasket, Target, Utensils } from "lucide-react";
+import { Bot, Check, Dumbbell, RotateCw, Search, Send, ShoppingBasket, Sparkles, Target, Utensils } from "lucide-react";
 import { useState } from "react";
 import type { UserContext } from "@khana/db";
 
@@ -34,14 +34,32 @@ export function PantryApp({ initialContext, initialPrediction, notification }: {
       <header className="topbar">
         <div>
           <h1>Pantry</h1>
-          <p>{initialContext.user.name} · {initialContext.user.location}</p>
+          <p>Speak once. Get the right food, groceries, and protein picks without the search spiral.</p>
         </div>
         <div className="tabs">
-          <button className={tab === "order" ? "active" : ""} onClick={() => setTab("order")}><Utensils size={17} /> Order</button>
-          <button className={tab === "pantry" ? "active" : ""} onClick={() => setTab("pantry")}><ShoppingBasket size={17} /> Pantry</button>
+          <button className={tab === "order" ? "active" : ""} onClick={() => setTab("order")}><Utensils size={17} /> Decide</button>
+          <button className={tab === "pantry" ? "active" : ""} onClick={() => setTab("pantry")}><ShoppingBasket size={17} /> Restock</button>
           <button className={tab === "goals" ? "active" : ""} onClick={() => setTab("goals")}><Target size={17} /> Goals</button>
         </div>
       </header>
+
+      <section className="mission">
+        <article>
+          <Search size={20} />
+          <h2>Decision fatigue, gone</h2>
+          <p>Ask naturally and Pantry searches Swiggy for you, compares options, then shows the best few with a short reason.</p>
+        </article>
+        <article>
+          <RotateCw size={20} />
+          <h2>Groceries that restock themselves</h2>
+          <p>It watches your staples, predicts what will run out, builds an Instamart cart, and can order within your budget guardrails.</p>
+        </article>
+        <article>
+          <Dumbbell size={20} />
+          <h2>Fitness-aware ordering</h2>
+          <p>Tell it your protein, calories, budget, cuisine, and dietary constraints. It recommends food and SKUs that actually fit.</p>
+        </article>
+      </section>
 
       {notification || initialPrediction.items.length ? (
         <button className="banner" onClick={() => send("Restock my pantry")}>
@@ -52,6 +70,11 @@ export function PantryApp({ initialContext, initialPrediction, notification }: {
       {tab === "order" && (
         <section className="order-grid">
           <div className="chat">
+            <div className="quick-prompts">
+              <button onClick={() => send("Dinner. High protein. Surprise me.")}><Sparkles size={16} /> Dinner, surprise me</button>
+              <button onClick={() => send("Restock my pantry")}><ShoppingBasket size={16} /> Restock low groceries</button>
+              <button onClick={() => send("I need more protein this week.")}><Dumbbell size={16} /> More protein this week</button>
+            </div>
             {messages.map((message, index) => (
               <div key={index} className={`bubble ${message.role}`}>
                 {message.role === "assistant" ? <Bot size={18} /> : null}
@@ -72,6 +95,10 @@ export function PantryApp({ initialContext, initialPrediction, notification }: {
 
       {tab === "pantry" && (
         <section className="panel">
+          <div className="panel-heading">
+            <h2>Autonomous restock queue</h2>
+            <p>Pantry looks at Aanya's grocery rhythm and proposes what to buy before the fridge is empty.</p>
+          </div>
           <table>
             <thead><tr><th>SKU</th><th>Last ordered</th><th>Days until empty</th></tr></thead>
             <tbody>
@@ -87,6 +114,10 @@ export function PantryApp({ initialContext, initialPrediction, notification }: {
 
       {tab === "goals" && (
         <section className="panel form">
+          <div className="panel-heading">
+            <h2>Personal constraints</h2>
+            <p>These goals guide ranking across restaurants and Instamart, so recommendations match the person, not just the query.</p>
+          </div>
           <label>Protein goal<input type="number" value={goals.protein_g} onChange={(event) => setGoals({ ...goals, protein_g: Number(event.target.value) })} /></label>
           <label>Calories<input type="number" value={goals.calories} onChange={(event) => setGoals({ ...goals, calories: Number(event.target.value) })} /></label>
           <label>Spice<input value={goals.spice} onChange={(event) => setGoals({ ...goals, spice: event.target.value })} /></label>
