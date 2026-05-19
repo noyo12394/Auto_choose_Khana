@@ -1,4 +1,4 @@
-import { skus, type Macro, type MenuItem, type Sku } from "../../../fixtures/index.js";
+import { skus, type Macro, type MenuItem, type Sku } from "@khana/fixtures";
 
 export type RankedPick<T> = T & { score: number; reason: string };
 export type GoalInput = {

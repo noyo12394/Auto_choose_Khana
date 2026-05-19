@@ -1,0 +1,19 @@
+{
+  "name": "@khana/web",
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "check": "tsc -p tsconfig.json --noEmit"
+  },
+  "dependencies": {
+    "@khana/agent": "workspace:*",
+    "@khana/core": "workspace:*",
+    "@khana/db": "workspace:*",
+    "@khana/fixtures": "workspace:*",
+    "next": "14.2.23",
+    "react": "18.3.1",
+    "react-dom": "18.3.1"
+  }
+}

@@ -1,4 +1,4 @@
-import { restaurants, type MenuItem } from "../../../fixtures/index.js";
+import { restaurants, type MenuItem } from "@khana/fixtures";
 
 export type SearchRestaurantsArgs = {
   location: string;

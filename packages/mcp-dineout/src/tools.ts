@@ -1,4 +1,4 @@
-import { dineoutRestaurants } from "../../../fixtures/index.js";
+import { dineoutRestaurants } from "@khana/fixtures";
 
 export function searchDineout(args: { location: string; cuisine?: string; party_size?: number; time?: string }) {
   const location = args.location.toLowerCase();

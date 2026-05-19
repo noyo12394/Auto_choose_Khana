@@ -5,17 +5,19 @@ import type { Tool } from "@modelcontextprotocol/sdk/types.js";
 import Anthropic from "@anthropic-ai/sdk";
 import { fileURLToPath } from "node:url";
 import { dirname, resolve } from "node:path";
-import { getUserContext, logToolCall } from "../../db/src/index.js";
-import { predictPantryRestock, rankMenuItems, rankSkus, remainingDailyGoal, sumMacros } from "../../core/src/index.js";
-import { skus, type MenuItem } from "../../../fixtures/index.js";
+import { getUserContext, logToolCall } from "@khana/db";
+import { predictPantryRestock, rankMenuItems, rankSkus, remainingDailyGoal, sumMacros } from "@khana/core";
+import { skus, type MenuItem } from "@khana/fixtures";
 
 type ServerName = "food" | "instamart" | "dineout";
 type ToolCall = { server: ServerName; name: string; args: unknown; result: unknown };
 type PendingFoodOrder = { restaurant_id: string; item_id: string; address_id: string; item_name: string; price: number };
+type PendingInstamartOrder = { cart_id: string; subtotal: number; item_count: number; address_id: string };
 
 const here = dirname(fileURLToPath(import.meta.url));
 const repoRoot = resolve(here, "../../..");
 const pendingFoodOrders = new Map<number, PendingFoodOrder>();
+const pendingInstamartOrders = new Map<number, PendingInstamartOrder>();
 
 const systemPrompt = `You are Pantry, a warm, concise Swiggy food and grocery assistant. Never patronize. Show brief reasoning. Confirm before placing orders unless within the user's auto-order budget. Order confirmations must say "Order placed on Swiggy". Never scrape. Never expose API keys.`;
 
@@ -118,13 +120,49 @@ export async function chat(userId: number, message: string): Promise<{ message: 
     return { message: `Order placed on Swiggy. ${pending.item_name} is on its way. ETA: ${(result as { eta?: string }).eta ?? "fresh from Swiggy"}.`, toolCalls };
   }
 
+  if (/\b(confirm|order|yes|place it)\b/i.test(message) && pendingInstamartOrders.has(userId)) {
+    const pending = pendingInstamartOrders.get(userId)!;
+    const args = { cart_id: pending.cart_id, address_id: pending.address_id };
+    const result = await hub.call(userId, "instamart", "checkout_instamart", args);
+    toolCalls.push({ server: "instamart", name: "checkout_instamart", args, result });
+    logToolCall(userId, "instamart", { order: result }, "placed");
+    pendingInstamartOrders.delete(userId);
+    return { message: `Order placed on Swiggy. ${pending.item_count} Instamart items are coming your way. ETA: ${(result as { eta?: string }).eta ?? "fresh from Swiggy"}.`, toolCalls };
+  }
+
   if (normalized.includes("pantry") || normalized.includes("restock")) {
     const proposal = predictPantryRestock(context.pantry);
     const ranked = rankSkus(skus, { dietary: context.profile.dietary }, 5);
+    if (proposal.items.length) {
+      const first = proposal.items[0]!;
+      const addArgs = { sku_id: first.sku_id, qty: 1 };
+      const added = (await hub.call(userId, "instamart", "add_to_cart", addArgs)) as { cart_id: string };
+      toolCalls.push({ server: "instamart", name: "add_to_cart", args: addArgs, result: added });
+      for (const item of proposal.items.slice(1)) {
+        const args = { sku_id: item.sku_id, qty: 1 };
+        const result = await hub.call(userId, "instamart", "add_to_cart", args);
+        toolCalls.push({ server: "instamart", name: "add_to_cart", args, result });
+      }
+      const cartArgs = { cart_id: added.cart_id };
+      const cart = (await hub.call(userId, "instamart", "view_cart", cartArgs)) as { subtotal: number };
+      toolCalls.push({ server: "instamart", name: "view_cart", args: cartArgs, result: cart });
+      pendingInstamartOrders.set(userId, { cart_id: added.cart_id, subtotal: cart.subtotal, item_count: proposal.items.length, address_id: "addr-aanya-home" });
+    }
     return {
       message: proposal.items.length
-        ? `Ready to restock? ${proposal.items.length} items running low. Proposed cart is ₹${proposal.subtotal}. Picked this because: ${proposal.items.map((item) => item.name).join(", ")} are likely empty within 48h.`
+        ? `Ready to restock? ${proposal.items.length} items running low. Proposed cart is ₹${proposal.subtotal}. Picked this because: ${proposal.items.map((item) => item.name).join(", ")} are likely empty within 48h. Say confirm and I’ll place the Instamart order.`
         : `Your tracked pantry looks steady for the next 48h. For more protein this week, try ${ranked[0]!.name}: ${ranked[0]!.reason}.`,
+      toolCalls
+    };
+  }
+
+  if (normalized.includes("protein") && (normalized.includes("week") || normalized.includes("grocery") || normalized.includes("instamart"))) {
+    const args = { query: "high-protein" };
+    const result = (await hub.call(userId, "instamart", "search_skus", args)) as typeof skus;
+    toolCalls.push({ server: "instamart", name: "search_skus", args, result });
+    const ranked = rankSkus(result, { dietary: context.profile.dietary }, 5);
+    return {
+      message: ranked.map((item, index) => `${index + 1}. ${item.name} - ₹${item.price}. Picked this because: ${item.reason}`).join("\n"),
       toolCalls
     };
   }

@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { restaurants } from "../../../fixtures/index.js";
+import { restaurants } from "@khana/fixtures";
 import { predictPantryRestock, rankMenuItems, remainingDailyGoal, sumMacros } from "./index.js";
 
 describe("core goal helpers", () => {

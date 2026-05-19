@@ -3,6 +3,11 @@
   "version": "0.1.0",
   "type": "module",
   "main": "src/index.ts",
+  "dependencies": {
+    "@khana/core": "workspace:*",
+    "@khana/db": "workspace:*",
+    "@khana/fixtures": "workspace:*"
+  },
   "scripts": {
     "build": "tsc -p tsconfig.json --noEmit",
     "check": "tsc -p tsconfig.json --noEmit"

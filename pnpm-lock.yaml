@@ -45,6 +45,12 @@ importers:
       '@types/node-cron':
         specifier: ^3.0.11
         version: 3.0.11
+      '@types/react':
+        specifier: 18.3.18
+        version: 18.3.18
+      '@types/react-dom':
+        specifier: 18.3.5
+        version: 18.3.5(@types/react@18.3.18)
       '@vitejs/plugin-react':
         specifier: ^4.3.4
         version: 4.7.0(vite@5.4.21(@types/node@22.19.19))
@@ -69,17 +75,71 @@ importers:
 
   apps/cli: {}
 
-  packages/agent: {}
+  apps/web:
+    dependencies:
+      '@khana/agent':
+        specifier: workspace:*
+        version: link:../../packages/agent
+      '@khana/core':
+        specifier: workspace:*
+        version: link:../../packages/core
+      '@khana/db':
+        specifier: workspace:*
+        version: link:../../packages/db
+      '@khana/fixtures':
+        specifier: workspace:*
+        version: link:../../fixtures
+      next:
+        specifier: 14.2.23
+        version: 14.2.23(@babel/core@7.29.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      react:
+        specifier: 18.3.1
+        version: 18.3.1
+      react-dom:
+        specifier: 18.3.1
+        version: 18.3.1(react@18.3.1)
 
-  packages/core: {}
+  fixtures: {}
+
+  packages/agent:
+    dependencies:
+      '@khana/core':
+        specifier: workspace:*
+        version: link:../core
+      '@khana/db':
+        specifier: workspace:*
+        version: link:../db
+      '@khana/fixtures':
+        specifier: workspace:*
+        version: link:../../fixtures
+
+  packages/core:
+    dependencies:
+      '@khana/fixtures':
+        specifier: workspace:*
+        version: link:../../fixtures
+
+  packages/cron: {}
 
   packages/db: {}
 
-  packages/mcp-dineout: {}
+  packages/mcp-dineout:
+    dependencies:
+      '@khana/fixtures':
+        specifier: workspace:*
+        version: link:../../fixtures
 
-  packages/mcp-food: {}
+  packages/mcp-food:
+    dependencies:
+      '@khana/fixtures':
+        specifier: workspace:*
+        version: link:../../fixtures
 
-  packages/mcp-instamart: {}
+  packages/mcp-instamart:
+    dependencies:
+      '@khana/fixtures':
+        specifier: workspace:*
+        version: link:../../fixtures
 
 packages:
 
@@ -714,6 +774,17 @@ packages:
   '@types/node@22.19.19':
     resolution: {integrity: sha512-dyh/xO2Fh5bYrfWaaqGrRQQGkNdmYw6AmaAUvYeUMNTWQtvb796ikLdmTchRmOlOiIJ1TDXfWgVx1QkUlQ6Hew==}
 
+  '@types/prop-types@15.7.15':
+    resolution: {integrity: sha512-F6bEyamV9jKGAFBEmlQnesRPGOQqS2+Uwi0Em15xenOxHaf2hv6L8YCVn3rPdPJOiJfPiCnLIRyvwVaqMY3MIw==}
+
+  '@types/react-dom@18.3.5':
+    resolution: {integrity: sha512-P4t6saawp+b/dFrUr2cvkVsfvPguwsxtH6dNIYRllMsefqFzkZk5UIjzyDOv5g1dXIPdG4Sp1yCR4Z6RCUsG/Q==}
+    peerDependencies:
+      '@types/react': ^18.0.0
+
+  '@types/react@18.3.18':
+    resolution: {integrity: sha512-t4yC+vtgnkYjNSKlFx1jkAhH8LgTo2N/7Qvi83kdEaUtMDiwpbLAktKDaAMlRcJ5eSxZkH74eEGt1ky31d7kfQ==}
+
   '@vitejs/plugin-react@4.7.0':
     resolution: {integrity: sha512-gUu9hwfWvvEDBBmgtAowQCojwZmJ5mcLn3aufeCsitijs3+f2NsrPtlAWIR6OPiqljl96GVCUbLe0HyqIpVaoA==}
     engines: {node: ^14.18.0 || >=16.0.0}
@@ -896,6 +967,9 @@ packages:
   cross-spawn@7.0.6:
     resolution: {integrity: sha512-uV2QOWP2nWzsy2aMp8aRibhi9dlzF5Hgh5SHaB9OiTGEyDTiJJyx0uy51QXdyWbtAHNua4XJzUKca3OzKUd3vA==}
     engines: {node: '>= 8'}
+
+  csstype@3.2.3:
+    resolution: {integrity: sha512-z1HGKcYy2xA8AGQfwrn0PAy+PB7X/GSj3UVJW9qKyn43xWa+gl5nXmU4qqLMRzWVLFC8KusUX8T/0kCiOYpAIQ==}
 
   debug@4.4.3:
     resolution: {integrity: sha512-RGwwWnwQvkVfavKVt22FGLw+xYSdzARwm0ru6DhTVA3umU5hZc28V3kO4stgYryrTlLpuvgI9GiijltAjNbcqA==}
@@ -2108,6 +2182,17 @@ snapshots:
     dependencies:
       undici-types: 6.21.0
 
+  '@types/prop-types@15.7.15': {}
+
+  '@types/react-dom@18.3.5(@types/react@18.3.18)':
+    dependencies:
+      '@types/react': 18.3.18
+
+  '@types/react@18.3.18':
+    dependencies:
+      '@types/prop-types': 15.7.15
+      csstype: 3.2.3
+
   '@vitejs/plugin-react@4.7.0(vite@5.4.21(@types/node@22.19.19))':
     dependencies:
       '@babel/core': 7.29.0
@@ -2314,6 +2399,8 @@ snapshots:
       path-key: 3.1.1
       shebang-command: 2.0.0
       which: 2.0.2
+
+  csstype@3.2.3: {}
 
   debug@4.4.3:
     dependencies:

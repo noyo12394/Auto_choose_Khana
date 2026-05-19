@@ -1,6 +1,7 @@
-import { skus } from "../../../fixtures/index.js";
+import { skus } from "@khana/fixtures";
 
 const carts = new Map<string, { sku_id: string; qty: number }[]>();
+let latestCartId: string | undefined;
 
 export function searchSkus(args: { query: string; category?: string }) {
   const query = args.query.toLowerCase();
@@ -19,8 +20,11 @@ export function getSku(sku_id: string) {
 
 export function addToCart(args: { sku_id: string; qty: number }) {
   getSku(args.sku_id);
-  const cartId = `cart-${Date.now()}`;
-  carts.set(cartId, [{ sku_id: args.sku_id, qty: args.qty }]);
+  const cartId = latestCartId ?? `cart-${Date.now()}`;
+  const lines = carts.get(cartId) ?? [];
+  lines.push({ sku_id: args.sku_id, qty: args.qty });
+  carts.set(cartId, lines);
+  latestCartId = cartId;
   return { cart_id: cartId };
 }
 
